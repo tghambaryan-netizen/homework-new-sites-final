@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bace - News Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(to bottom right, #fed7aa, #fef3c7, #fecaca);
+            min-height: 100vh;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            background: white;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            padding: 24px;
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+
+        .sidebar.hidden {
+            transform: translateX(-100%);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 32px;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(to bottom right, #f97316, #dc2626);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .logo-text {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #e5e7eb;
+            margin-bottom: 24px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(to bottom right, #60a5fa, #a78bfa);
+            border-radius: 50%;
+        }
+
+        .user-info {
+            flex: 1;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .user-email {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-bottom: 4px;
+            font-size: 14px;
+            color: #374151;
+        }
+
+        .nav-item:hover {
+            background: #f3f4f6;
+        }
+
+        .nav-item.active {
+            background: #fff7ed;
+            color: #f97316;
+        }
+
+        .nav-divider {
+            height: 1px;
+            background: #e5e7eb;
+            margin: 16px 0;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 260px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: #1f2937;
+            color: white;
+            padding: 16px 24px;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .subscribe-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+        }
+
+        .subscribe-btn {
+            background: white;
+            color: #1f2937;
+            padding: 8px 16px;
+            border-radius: 24px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+
+        .subscribe-btn:hover {
+            background: #f3f4f6;
+        }
+
+        .search-section {
+            background: white;
+            padding: 16px 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            sticky: top;
+            z-index: 100;
+        }
+
+        .search-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .search-bar {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .search-input-wrapper {
+            flex: 1;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 10px 16px 10px 40px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+        }
+
+        .bell-icon {
+            padding: 8px;
+            cursor: pointer;
+            border-radius: 8px;
+        }
+
+        .bell-icon:hover {
+            background: #f3f4f6;
+        }
+
+        .category-tags {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+        }
+
+        .category-tag {
+            padding: 8px 16px;
+            background: #f3f4f6;
+            border-radius: 24px;
+            font-size: 14px;
+            white-space: nowrap;
+            cursor: pointer;
+            border: none;
+        }
+
+        .category-tag:hover {
+            background: #e5e7eb;
+        }
+
+        .content-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+        }
+
+        .content-wrapper {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            gap: 24px;
+        }
+
+        .main-feed {
+            flex: 1;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 32px;
+            border-bottom: 2px solid #e5e7eb;
+            margin-bottom: 24px;
+        }
+
+        .tab {
+            padding-bottom: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            color: #6b7280;
+            border: none;
+            background: none;
+            font-size: 16px;
+            position: relative;
+        }
+
+        .tab.active {
+            color: #f97316;
+        }
+
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #f97316;
+        }
+
+        .trending-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .trending-card {
+            position: relative;
+            height: 320px;
+            border-radius: 16px;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .trending-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s;
+        }
+
+        .trending-card:hover img {
+            transform: scale(1.05);
+        }
+
+        .trending-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.8), rgba(0,0,0,0.3), transparent);
+        }
+
+        .trending-badge {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            background: #f97316;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 24px;
+            font-size: 12px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .trending-content {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 24px;
+            color: white;
+        }
+
+        .trending-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .trending-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            line-height: 1.3;
+        }
+
+        .trending-snippet {
+            font-size: 14px;
+            opacity: 0.9;
+            line-height: 1.4;
+        }
+
+        .articles-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .article-card {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            gap: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: box-shadow 0.2s;
+        }
+
+        .article-card:hover {
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .article-image {
+            width: 128px;
+            height: 96px;
+            object-fit: cover;
+            border-radius: 8px;
+            flex-shrink: 0;
+        }
+
+        .article-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .article-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .article-avatar {
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(to bottom right, #60a5fa, #a78bfa);
+            border-radius: 50%;
+        }
+
+        .article-source {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .article-category {
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        .article-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .article-snippet {
+            font-size: 14px;
+            color: #6b7280;
+            margin-bottom: 8px;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .article-info {
+            display: flex;
+            gap: 16px;
+            font-size: 12px;
+            color: #9ca3af;
+        }
+
+        .bookmark-btn {
+            padding: 8px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            border-radius: 8px;
+        }
+
+        .bookmark-btn:hover {
+            background: #f3f4f6;
+        }
+
+        /* Sidebar Right */
+        .sidebar-right {
+            width: 320px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .curated-picks h3,
+        .categories-widget h3,
+        .follows-widget h3 {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 16px;
+        }
+
+        .curated-item {
+            margin-bottom: 16px;
+            cursor: pointer;
+        }
+
+        .curated-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .curated-content {
+            display: flex;
+            gap: 12px;
+        }
+
+        .curated-text {
+            flex: 1;
+        }
+
+        .curated-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .curated-title:hover {
+            color: #f97316;
+        }
+
+        .curated-image {
+            width: 80px;
+            height: 64px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .categories-widget,
+        .follows-widget {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .category-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .category-pill {
+            padding: 6px 12px;
+            background: #f3f4f6;
+            border-radius: 24px;
+            font-size: 14px;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+
+        .category-pill:hover {
+            background: #f97316;
+            color: white;
+        }
+
+        .view-more-btn {
+            width: 100%;
+            padding: 8px;
+            background: none;
+            border: none;
+            color: #f97316;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .follow-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .follow-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .follow-avatar {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(to bottom right, #60a5fa, #a78bfa);
+            border-radius: 50%;
+        }
+
+        .follow-btn {
+            padding: 6px 12px;
+            background: #f97316;
+            color: white;
+            border: none;
+            border-radius: 24px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .follow-btn:hover {
+            background: #ea580c;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 48px;
+            font-size: 18px;
+            color: #6b7280;
+        }
+
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid #f3f4f6;
+            border-top-color: #f97316;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            padding: 8px;
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+        }
+
+        .overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+        }
+
+        .overlay.active {
+            display: block;
+        }
+
+        @media (max-width: 1280px) {
+            .sidebar-right {
+                display: none;
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .trending-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .article-card {
+                flex-direction: column;
+            }
+
+            .article-image {
+                width: 100%;
+                height: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="overlay" id="overlay"></div>
+    
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="logo">
+                <div class="logo-icon">B</div>
+                <div class="logo-text">Bace</div>
+            </div>
+
+            <div class="user-profile">
+                <div class="user-avatar"></div>
+                <div class="user-info">
+                    <div class="user-name">Rae</div>
+                    <div class="user-email">rae.email@gmail.com</div>
+                </div>
+            </div>
+
+            <nav>
+                <div class="nav-item active">
+                    <span>🏠</span>
+                    <span>Home</span>
+                </div>
+                <div class="nav-item">
+                    <span>🎧</span>
+                    <span>Audio Books</span>
+                </div>
+                <div class="nav-item">
+                    <span>🔖</span>
+                    <span>Saved</span>
+                </div>
+                <div class="nav-item">
+                    <span>🕐</span>
+                    <span>Read History</span>
+                </div>
+                <div class="nav-item">
+                    <span>⬇️</span>
+                    <span>Downloaded</span>
+                </div>
+                <div class="nav-divider"></div>
+                <div class="nav-item">
+                    <span>📈</span>
+                    <span>Now Trending</span>
+                </div>
+                <div class="nav-item">
+                    <span>📁</span>
+                    <span>Categories</span>
+                </div>
+                <div class="nav-item">
+                    <span>👥</span>
+                    <span>Following</span>
+                </div>
+                <div class="nav-divider"></div>
+                <div class="nav-item">
+                    <span>⚙️</span>
+                    <span>Setting</span>
+                </div>
+                <div class="nav-item">
+                    <span>❓</span>
+                    <span>Help</span>
+                </div>
+                <div class="nav-item">
+                    <span>💬</span>
+                    <span>Send Feedback</span>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="header">
+                <div class="header-content">
+                    <button class="mobile-menu-btn" id="menuBtn">☰</button>
+                    <div class="subscribe-info">
+                        <div class="logo-icon">B</div>
+                        <div>
+                            <strong>Subscribe to Bace+</strong>
+                            <span style="color: #9ca3af; margin-left: 8px;">Unlock an ad-free reading experience</span>
+                        </div>
+                    </div>
+                    <button class="subscribe-btn">Subscribe Now</button>
+                </div>
+            </header>
+
+            <!-- Search Section -->
+            <section class="search-section">
+                <div class="search-container">
+                    <div class="search-bar">
+                        <div class="search-input-wrapper">
+                            <span class="search-icon">🔍</span>
+                            <input type="text" class="search-input" placeholder="Search News">
+                        </div>
+                        <div class="bell-icon">🔔</div>
+                    </div>
+                    <div class="category-tags">
+                        <button class="category-tag"># Health & Wellness</button>
+                        <button class="category-tag"># Fitness & Exercise</button>
+                        <button class="category-tag"># Mental Health</button>
+                        <button class="category-tag"># Nutrition & Diet</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Content Area -->
+            <div class="content-area">
+                <div class="content-wrapper">
+                    <!-- Main Feed -->
+                    <div class="main-feed">
+                        <div class="tabs">
+                            <button class="tab active">For You</button>
+                            <button class="tab">Trending</button>
+                            <button class="tab">Following</button>
+                        </div>
+
+                        <div id="loading" class="loading">
+                            <div class="spinner"></div>
+                            <div>Loading news...</div>
+                        </div>
+
+                        <div id="trending-section" class="trending-grid" style="display: none;"></div>
+                        <div id="articles-section" class="articles-list" style="display: none;"></div>
+                    </div>
+
+                    <!-- Right Sidebar -->
+                    <div class="sidebar-right">
+                        <div class="curated-picks">
+                            <h3>Curated Picks</h3>
+                            <div id="curated-content"></div>
+                        </div>
+
+                        <div class="categories-widget">
+                            <h3>Categories</h3>
+                            <div class="category-pills">
+                                <button class="category-pill">Fashion</button>
+                                <button class="category-pill">Politics</button>
+                                <button class="category-pill">Entertainment</button>
+                                <button class="category-pill">Sports</button>
+                                <button class="category-pill">Technology</button>
+                                <button class="category-pill">Finance</button>
+                                <button class="category-pill">Health & Wellness</button>
+                                <button class="category-pill">Science</button>
+                                <button class="category-pill">Lifestyle</button>
+                            </div>
+                            <button class="view-more-btn">View More Categories</button>
+                        </div>
+
+                        <div class="follows-widget">
+                            <h3>Recommended Follows</h3>
+                            <div class="follow-item">
+                                <div class="follow-info">
+                                    <div class="follow-avatar"></div>
+                                    <span style="font-weight: 600; font-size: 14px;">Tech Today</span>
+                                </div>
+                                <button class="follow-btn">Follow</button>
+                            </div>
+                            <div class="follow-item">
+                                <div class="follow-info">
+                                    <div class="follow-avatar"></div>
+                                    <span style="font-weight: 600; font-size: 14px;">World News</span>
+                                </div>
+                                <button class="follow-btn">Follow</button>
+                            </div>
+                            <div class="follow-item">
+                                <div class="follow-info">
+                                    <div class="follow-avatar"></div>
+                                    <span style="font-weight: 600; font-size: 14px;">Science Daily</span>
+                                </div>
+                                <button class="follow-btn">Follow</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const API_TOKEN = 'wKBYVV4NpN12RUoYCcOsN0IuwgJ5ocojObbtG7Ns';
+        const API_URL = `https://api.thenewsapi.com/v1/news/top?api_token=${API_TOKEN}&locale=us,gb&limit=20`;
+
+        let articles = [];
+
+        // Mobile menu
+        const menuBtn = document.getElementById('menuBtn');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+
+        menuBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        });
+
+        overlay.addEventListener('click', () => {
+            sidebar.classList.remove('active');
+            overlay.classList.remove('active');
+        });
+
+        // Fetch news
+        async function fetchNews() {
+            try {
+                const response = await fetch(API_URL);
+                const data = await response.json();
+                articles = data.data || [];
+                renderNews();
+            } catch (error) {
+                console.error('Error fetching news:', error);
+                document.getElementById('loading').innerHTML = '<div>Failed to load news. Please try again.</div>';
+            }
+        }
+
+        function getReadTime(description) {
+            const words = description ? description.split(' ').length : 100;
+            return Math.ceil(words / 200);
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
+        }
+
+        function renderNews() {
+            document.getElementById('loading').style.display = 'none';
+            
+            // Trending section
+            const trendingSection = document.getElementById('trending-section');
+            trendingSection.style.display = 'grid';
+            const trendingArticles = articles.slice(0, 2);
+            
+            trendingSection.innerHTML = trendingArticles.map((article, idx) => `
+                <div class="trending-card">
+                    <img src="${article.image_url || 'https://via.placeholder.com/600x400'}" alt="${article.title}">
+                    <div class="trending-overlay"></div>
+                    <div class="trending-badge">
+                        📈 Trending #${idx + 1}
+                    </div>
+                    <div class="trending-content">
+                        <div class="trending-meta">
+                            <div style="width: 24px; height: 24px; background: rgba(255,255,255,0.2); border-radius: 50%;"></div>
+                            <span>${article.source}</span>
+                            <span>• ${article.categories[0] || 'General'}</span>
+                        </div>
+                        <div class="trending-title">${article.title}</div>
+                        <div class="trending-snippet">${article.snippet || article.description || ''}</div>
+                    </div>
+                </div>
+            `).join('');
+
+            // Regular articles
+            const articlesSection = document.getElementById('articles-section');
+            articlesSection.style.display = 'flex';
+            const regularArticles = articles.slice(5);
+            
+            articlesSection.innerHTML = regularArticles.map(article => `
+                <div class="article-card">
+                    <img src="${article.image_url || 'https://via.placeholder.com/200x150'}" alt="${article.title}" class="article-image">
+                    <div class="article-content">
+                        <div class="article-meta">
+                            <div class="article-avatar"></div>
+                            <span class="article-source">${article.source}</span>
+                            <span class="article-category">• ${article.categories[0] || 'General'}</span>
+                        </div>
+                        <div class="article-title">${article.title}</div>
+                        <div class="article-snippet">${article.snippet || article.description || ''}</div>
+                        <div class="article-info">
+                            <span>${formatDate(article.published_at)}</span>
+                            <span>${getReadTime(article.description)} min read</span>
+                        </div>
+                    </div>
+                    <button class="bookmark-btn">🔖</button>
+                </div>
+            `).join('');
+
+            // Curated picks
+            const curatedContent = document.getElementById('curated-content');
+            const curatedArticles = articles.slice(2, 5);
+            
+            curatedContent.innerHTML = curatedArticles.map(article => `
+                <div class="curated-item">
+                    <div class="curated-meta">
+                        <div class="article-avatar"></div>
+                        <span style="font-size: 14px; font-weight: 600;">${article.source}</span>
+                        <span style="font-size: 14px; color: #6b7280;">• ${article.categories[0] || 'General'}</span>
+                    </div>
+                    <div class="curated-content">
+                        <div class="curated-text">
+                            <div class="curated-title">${article.title}</div>
+                            <div style="font-size: 12px; color: #9ca3af;">
+                                ${formatDate(article.published_at)} • ${getReadTime(article.description)} min read
+                            </div>
+                        </div>
+                        <img src="${article.image_url || 'https://via.placeholder.com/100x80'}" alt="${article.title}" class="curated-image">
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Tab switching
+        const tabs = document.querySelectorAll('.tab');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+            });
+        });
+
+        // Initialize
+        fetchNews();
+    </script>
+</body>
+</html>
